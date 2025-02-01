@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Space Traffic Management</title>
+    <!-- Import Map to force Three.js to a pinned version -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.skypack.dev/three@0.150.0?min"
+        }
+      }
+    </script>
     <style>
       /* ---------- Global & Reset Styles ---------- */
       * {
@@ -277,8 +285,8 @@
     
     <!-- ---------- Interactive Globe Script using globe.gl from Skypack ---------- -->
     <script type="module">
-      // Import Globe from Skypack. Skypack automatically converts the package to an ES module.
-      import Globe from "https://cdn.skypack.dev/globe.gl";
+      // Import Globe from Skypack. Skypack converts the package into an ES module.
+      import Globe from "https://cdn.skypack.dev/globe.gl@2.7.4";
       
       // Create the globe in the container with id "globeViz"
       const myGlobe = Globe()(document.getElementById("globeViz"))
