@@ -89,7 +89,6 @@
         justify-content: center;
         align-items: center;
       }
-      /* Container for our Three.js globe */
       .globe-container {
         width: 100%;
         height: 500px;
@@ -168,7 +167,7 @@
       </div>
     </div>
 
-    <!-- ---------- Dashboard Section (Interactive Globe) ---------- -->
+    <!-- ---------- Dashboard Section (Globe Visualization) ---------- -->
     <div class="dashboard">
       <div class="dashboard-header">
         <div class="logo">Logo</div>
@@ -178,17 +177,18 @@
         </div>
       </div>
       <div class="dashboard-content">
-        <!-- Container for the globe -->
         <div class="globe-container" id="globeContainer"></div>
       </div>
     </div>
 
     <!-- ---------- Main Content: Capabilities & Contact Form ---------- -->
     <div class="container">
-      <!-- Capabilities Section -->
       <section class="capabilities">
         <h2>Our Capabilities</h2>
-        <p>We provide cutting-edge solutions for space traffic management, including:</p>
+        <p>
+          We provide cutting-edge solutions for space traffic management,
+          including:
+        </p>
         <ul>
           <li>Real-time satellite tracking</li>
           <li>Debris monitoring and collision avoidance</li>
@@ -197,8 +197,6 @@
           <li>Regulatory compliance support</li>
         </ul>
       </section>
-
-      <!-- Contact Form Section -->
       <section class="contact">
         <h2>Contact Us</h2>
         <form class="contact-form" action="#" method="post">
@@ -260,16 +258,17 @@
 
     <!-- ---------- Globe Visualization Script using Three.js ---------- -->
     <script type="module">
-      // Import Three.js and OrbitControls from a stable CDN version
+      // Import Three.js and OrbitControls using absolute URLs.
       import * as THREE from "https://unpkg.com/three@0.150.0/build/three.module.js";
       import { OrbitControls } from "https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js";
 
-      // Scene, Camera, Renderer
+      // Get the container for the globe.
       const container = document.getElementById("globeContainer");
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
+      // Create scene and camera.
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
         45,
@@ -279,57 +278,60 @@
       );
       camera.position.set(0, 0, 250);
 
-      // Add OrbitControls
+      // Add OrbitControls.
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
 
-      // Create Earth (Globe)
+      // Create Earth as a textured sphere.
       const sphereGeometry = new THREE.SphereGeometry(50, 64, 64);
       const textureLoader = new THREE.TextureLoader();
-      const earthTexture = textureLoader.load("https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg");
+      const earthTexture = textureLoader.load(
+        "https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg"
+      );
       const sphereMaterial = new THREE.MeshPhongMaterial({ map: earthTexture });
       const earthMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
       scene.add(earthMesh);
 
-      // Add Ambient and Directional Lights
+      // Add lighting.
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
       scene.add(ambientLight);
       const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
       directionalLight.position.set(100, 50, 100);
       scene.add(directionalLight);
 
-      // Create Satellite markers (small spheres) and orbit parameters
+      // Create satellite markers (small red spheres) and set orbit parameters.
       const satellites = [];
       const satelliteGeometry = new THREE.SphereGeometry(1.5, 16, 16);
       const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-      // Define three satellites with different orbit radii and speeds
       const satelliteData = [
         { orbitRadius: 65, speed: 0.02, angle: Math.random() * Math.PI * 2 },
         { orbitRadius: 70, speed: 0.015, angle: Math.random() * Math.PI * 2 },
         { orbitRadius: 75, speed: 0.01, angle: Math.random() * Math.PI * 2 }
       ];
       satelliteData.forEach((data) => {
-        const satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
-        satellite.userData = data;
-        scene.add(satellite);
-        satellites.push(satellite);
+        const sat = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
+        sat.userData = data;
+        scene.add(sat);
+        satellites.push(sat);
       });
 
-      // Animation loop
+      // Animation loop.
       function animate() {
         requestAnimationFrame(animate);
         controls.update();
 
-        // Rotate the Earth slowly
+        // Rotate Earth.
         earthMesh.rotation.y += 0.001;
 
-        // Update satellite positions (simple circular orbits in the equatorial plane)
+        // Update satellite positions (circular orbits).
         satellites.forEach((sat) => {
           sat.userData.angle += sat.userData.speed;
-          sat.position.x = sat.userData.orbitRadius * Math.cos(sat.userData.angle);
-          sat.position.z = sat.userData.orbitRadius * Math.sin(sat.userData.angle);
-          // Optionally, add a slight tilt for variety:
+          sat.position.x =
+            sat.userData.orbitRadius * Math.cos(sat.userData.angle);
+          sat.position.z =
+            sat.userData.orbitRadius * Math.sin(sat.userData.angle);
+          // Optional tilt.
           sat.position.y = 5 * Math.sin(sat.userData.angle * 2);
         });
 
@@ -337,7 +339,7 @@
       }
       animate();
 
-      // Handle window resize
+      // Handle window resize.
       window.addEventListener("resize", () => {
         const width = container.clientWidth;
         const height = container.clientHeight;
