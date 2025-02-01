@@ -5,65 +5,294 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Space Traffic Management</title>
     <style>
-      /* Basic Reset and Body Styling */
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: sans-serif; background: #000; color: #fff; }
-      
-      /* Full-screen container for the interactive globe */
-      #globeViz {
-        width: 100%;
-        height: 100vh;
+      /* ---------- Global & Reset Styles ---------- */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-
-      /* Example: Additional styling for a header (optional) */
-      header {
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #333;
+        line-height: 1.6;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      /* ---------- Hero Section with Starfield ---------- */
+      .hero {
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+      }
+      #starfield {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        padding: 1rem;
+        height: 100%;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
-        z-index: 10;
-        background: rgba(0, 0, 0, 0.5);
+        padding: 0 1rem;
+      }
+      .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+        color: #fff;
+      }
+      .hero-content p {
+        font-size: 1.5rem;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+        color: #ddd;
+      }
+      /* ---------- Dashboard Section (Interactive Globe) ---------- */
+      .dashboard {
+        background-color: #fff;
+        color: #333;
+        margin: 2rem auto;
+        padding: 1rem;
+        max-width: 1200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .dashboard-header .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .dashboard-header .nav-links a {
+        margin-left: 1rem;
+        font-weight: bold;
+        color: #000;
+      }
+      .dashboard-content {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .globe-container {
+        flex: 1;
+        min-width: 300px;
+        height: 500px;
+        position: relative;
+      }
+      #globeViz {
+        width: 100%;
+        height: 100%;
+      }
+      /* ---------- Main Content (Capabilities & Contact Form) ---------- */
+      .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #fff;
+        color: #333;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      section {
+        margin-bottom: 2rem;
+      }
+      h2 {
+        margin-bottom: 1rem;
+        padding-bottom: 0.25rem;
+        border-bottom: 2px solid #000;
+      }
+      .capabilities ul {
+        list-style-type: disc;
+        margin-left: 1.5rem;
+      }
+      /* ---------- Contact Form Styles ---------- */
+      .contact-form label {
+        display: block;
+        margin: 0.5rem 0 0.25rem;
+      }
+      .contact-form input,
+      .contact-form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+      }
+      .contact-form button {
+        padding: 0.75rem 1.5rem;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .contact-form button:hover {
+        background-color: #333;
+      }
+      /* ---------- Footer ---------- */
+      footer {
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: #666;
+        background-color: #fff;
+      }
+      /* ---------- Responsive Tweaks ---------- */
+      @media (max-width: 768px) {
+        .dashboard-content {
+          flex-direction: column;
+        }
       }
     </style>
   </head>
   <body>
-    <!-- Optional header or other sections -->
-    <header>
-      <h1>Space Traffic Management</h1>
-      <p>Interactive Globe Demo</p>
-    </header>
+    <!-- ---------- Hero Section with Animated Starfield ---------- -->
+    <div class="hero">
+      <canvas id="starfield"></canvas>
+      <div class="hero-content">
+        <h1>Space Traffic Management</h1>
+        <p>Ensuring safe and efficient management of space traffic.</p>
+      </div>
+    </div>
 
-    <!-- Container for the interactive globe -->
-    <div id="globeViz"></div>
+    <!-- ---------- Dashboard Section (Interactive Globe) ---------- -->
+    <div class="dashboard">
+      <div class="dashboard-header">
+        <div class="logo">Logo</div>
+        <div class="nav-links">
+          <a href="#">My Satellites</a>
+          <a href="#">Notifications (3)</a>
+        </div>
+      </div>
+      <div class="dashboard-content">
+        <!-- Interactive Globe Container -->
+        <div class="globe-container">
+          <div id="globeViz"></div>
+        </div>
+      </div>
+    </div>
 
-    <!-- ---------- Interactive Globe Script using globe.gl ---------- -->
+    <!-- ---------- Main Content: Capabilities & Contact Form ---------- -->
+    <div class="container">
+      <!-- Capabilities Section -->
+      <section class="capabilities">
+        <h2>Our Capabilities</h2>
+        <p>
+          We provide cutting-edge solutions for space traffic management,
+          including:
+        </p>
+        <ul>
+          <li>Real-time satellite tracking</li>
+          <li>Debris monitoring and collision avoidance</li>
+          <li>Orbit prediction and analysis</li>
+          <li>Automated alert systems</li>
+          <li>Regulatory compliance support</li>
+        </ul>
+      </section>
+
+      <!-- Contact Form Section -->
+      <section class="contact">
+        <h2>Contact Us</h2>
+        <form class="contact-form" action="#" method="post">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required />
+
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+
+          <button type="submit">Send Message</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- ---------- Footer ---------- -->
+    <footer>
+      &copy; 2025 Space Traffic Management. All Rights Reserved.
+    </footer>
+
+    <!-- ---------- Starfield Animation Script ---------- -->
+    <script>
+      (function () {
+        const canvas = document.getElementById("starfield");
+        const ctx = canvas.getContext("2d");
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+        const stars = [];
+        const numStars = 300;
+        for (let i = 0; i < numStars; i++) {
+          stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 1.5,
+            speed: Math.random() * 0.5 + 0.2,
+          });
+        }
+        function animate() {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          stars.forEach((star) => {
+            star.y += star.speed;
+            if (star.y > height) {
+              star.y = 0;
+              star.x = Math.random() * width;
+            }
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener("resize", () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        });
+      })();
+    </script>
+
+    <!-- ---------- Interactive Globe Script using globe.gl (from jsDelivr) ---------- -->
     <script type="module">
-      // Import Globe from a pinned version of globe.gl (version 2.7.4)
-      import Globe from 'https://unpkg.com/globe.gl@2.7.4/dist/globe.gl.min.js?module';
+      import Globe from "https://cdn.jsdelivr.net/npm/globe.gl@2.7.4/dist/globe.gl.min.js?module";
       
       // Create the globe in the container with id "globeViz"
-      const myGlobe = Globe()(document.getElementById('globeViz'))
-        // Use a dark Earth image (from three-globe's example images)
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg');
+      const myGlobe = Globe()(document.getElementById("globeViz"))
+        .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg");
       
-      // Optionally add some sample point data (e.g. satellites)
+      // Sample satellite markers (dummy data)
       const samplePoints = [
         { lat: 20, lng: 30, name: "Satellite 1" },
         { lat: 40, lng: -10, name: "Satellite 2" },
         { lat: -30, lng: 120, name: "Satellite 3" }
       ];
-      // Here we use the pointsData API to add data to the globe.
-      // (Feel free to customize the appearance as needed.)
+      
+      // Configure the globe to show these points
       myGlobe
         .pointsData(samplePoints)
-        .pointLat('lat')
-        .pointLng('lng')
-        .pointColor(() => 'red')
+        .pointLat("lat")
+        .pointLng("lng")
+        .pointColor(() => "red")
         .pointRadius(0.5);
       
-      // Simple animation: slowly rotate the globe over time
+      // Animate the globe: slowly rotate it
       (function animate() {
         requestAnimationFrame(animate);
         myGlobe.rotation.y += 0.001;
