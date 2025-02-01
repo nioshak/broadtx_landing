@@ -12,7 +12,6 @@
         }
       }
     </script>
-    <!-- (Note: We removed GSAP since we’re using TWEEN for smooth animations) -->
     <style>
       /* ---------- Global & Reset Styles ---------- */
       * {
@@ -366,7 +365,8 @@
       import * as THREE from "https://unpkg.com/three@0.150.0/build/three.module.js";
       import { OrbitControls } from "https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js";
       import ThreeGlobe from "https://unpkg.com/three-globe?module";
-      import TWEEN from "https://unpkg.com/three@0.150.0/examples/jsm/libs/tween.module.js";
+      // Import TWEEN from @tweenjs/tween.js (official package)
+      import TWEEN from "https://unpkg.com/@tweenjs/tween.js@18.6.4/dist/tween.esm.js";
 
       // Sample satellite markers with dummy lat/lng values
       const satelliteMarkers = [
@@ -387,10 +387,7 @@
 
       const globeContainer = document.getElementById("globeViz");
       const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(
-        globeContainer.offsetWidth,
-        globeContainer.offsetHeight
-      );
+      renderer.setSize(globeContainer.offsetWidth, globeContainer.offsetHeight);
       globeContainer.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
@@ -417,7 +414,7 @@
 
       function animateGlobe() {
         requestAnimationFrame(animateGlobe);
-        // Update TWEEN for smooth animations (Option 3)
+        // Update TWEEN for smooth animations
         TWEEN.update();
         // Optional: slowly rotate the globe for a dynamic effect
         GlobeObj.rotation.y += 0.001;
