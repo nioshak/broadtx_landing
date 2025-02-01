@@ -269,9 +269,10 @@
       })();
     </script>
 
-    <!-- ---------- Interactive Globe Script using globe.gl (from jsDelivr) ---------- -->
+    <!-- ---------- Interactive Globe Script using globe.gl ---------- -->
     <script type="module">
-      import Globe from "https://cdn.jsdelivr.net/npm/globe.gl@2.7.4/dist/globe.gl.min.js?module";
+      // Import Globe from unpkg (ES module version)
+      import Globe from "https://unpkg.com/globe.gl@2.7.4?module";
       
       // Create the globe in the container with id "globeViz"
       const myGlobe = Globe()(document.getElementById("globeViz"))
