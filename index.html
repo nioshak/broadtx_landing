@@ -4,11 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Space Traffic Management</title>
-    <!-- Import Map to force Three.js to a pinned version -->
+    <!--
+      Import map:
+        - Force Three.js to version 0.150.0 (which exports the expected symbols, including Camera)
+        - Stub out "frame-ticker" so that any internal import is satisfied
+    -->
     <script type="importmap">
       {
         "imports": {
-          "three": "https://cdn.skypack.dev/three@0.150.0?min"
+          "three": "https://unpkg.com/three@0.150.0/build/three.module.js",
+          "frame-ticker": "data:text/javascript,export default {};"
         }
       }
     </script>
@@ -29,6 +34,7 @@
         color: inherit;
         text-decoration: none;
       }
+      
       /* ---------- Hero Section with Starfield ---------- */
       .hero {
         position: relative;
@@ -65,6 +71,7 @@
         text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
         color: #ddd;
       }
+      
       /* ---------- Dashboard Section (Interactive Globe) ---------- */
       .dashboard {
         background-color: #fff;
@@ -106,6 +113,7 @@
         width: 100%;
         height: 100%;
       }
+      
       /* ---------- Main Content (Capabilities & Contact Form) ---------- */
       .container {
         max-width: 800px;
@@ -128,6 +136,7 @@
         list-style-type: disc;
         margin-left: 1.5rem;
       }
+      
       /* ---------- Contact Form Styles ---------- */
       .contact-form label {
         display: block;
@@ -153,6 +162,7 @@
       .contact-form button:hover {
         background-color: #333;
       }
+      
       /* ---------- Footer ---------- */
       footer {
         text-align: center;
@@ -161,6 +171,7 @@
         color: #666;
         background-color: #fff;
       }
+      
       /* ---------- Responsive Tweaks ---------- */
       @media (max-width: 768px) {
         .dashboard-content {
@@ -277,35 +288,69 @@
       })();
     </script>
     
-    <!-- ---------- Interactive Globe Script using globe.gl from Skypack ---------- -->
+    <!-- ---------- Interactive Globe Script using three-globe ---------- -->
     <script type="module">
-      // Import Globe from Skypack (without a version parameter)
-      import Globe from "https://cdn.skypack.dev/globe.gl";
+      // Import modules
+      import * as THREE from "three";
+      import { OrbitControls } from "https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js";
+      import ThreeGlobe from "https://unpkg.com/three-globe@2.24.2/build/three-globe.min.js?module";
       
-      // Create the globe in the container with id "globeViz"
-      const myGlobe = Globe()(document.getElementById("globeViz"))
-        .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg");
+      // Set up renderer, scene, and camera
+      const globeContainer = document.getElementById("globeViz");
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(globeContainer.offsetWidth, globeContainer.offsetHeight);
+      globeContainer.appendChild(renderer.domElement);
       
-      // Sample satellite markers (dummy data)
-      const samplePoints = [
-        { lat: 20, lng: 30, name: "Satellite 1" },
-        { lat: 40, lng: -10, name: "Satellite 2" },
-        { lat: -30, lng: 120, name: "Satellite 3" }
-      ];
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        globeContainer.offsetWidth / globeContainer.offsetHeight,
+        0.1,
+        1000
+      );
+      camera.position.z = 200;
       
-      // Configure the globe to show these points
-      myGlobe
-        .pointsData(samplePoints)
+      // Add ambient and directional lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+      directionalLight.position.set(50, 50, 50);
+      scene.add(directionalLight);
+      
+      // Create the globe using ThreeGlobe
+      const GlobeObj = new ThreeGlobe()
+        .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg")
+        .pointsData([
+          { lat: 20, lng: 30, name: "Satellite 1" },
+          { lat: 40, lng: -10, name: "Satellite 2" },
+          { lat: -30, lng: 120, name: "Satellite 3" }
+        ])
         .pointLat("lat")
         .pointLng("lng")
         .pointColor(() => "red")
         .pointRadius(0.5);
       
-      // Animate the globe: slowly rotate it
-      (function animate() {
-        requestAnimationFrame(animate);
-        myGlobe.rotation.y += 0.001;
-      })();
+      scene.add(GlobeObj);
+      
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = true;
+      
+      // Animation loop
+      function animateGlobe() {
+        requestAnimationFrame(animateGlobe);
+        GlobeObj.rotation.y += 0.001;
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animateGlobe();
+      
+      window.addEventListener("resize", () => {
+        const width = globeContainer.offsetWidth;
+        const height = globeContainer.offsetHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+      });
     </script>
   </body>
 </html>
