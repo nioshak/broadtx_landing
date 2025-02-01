@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Space Traffic Management</title>
-    <!-- Import Map: redirect frame-ticker to a working CDN URL -->
+    <!-- Import Map: redirect any taichi.js requests to a working CDN URL -->
     <script type="importmap">
       {
         "imports": {
-          "frame-ticker": "https://cdn.jsdelivr.net/npm/frame-ticker@1.0.3/dist/index.js",
           "taichi.js": "https://cdn.jsdelivr.net/npm/taichi.js@0.0.36/dist/taichi.js"
         }
       }
     </script>
+    <!-- (Note: We removed GSAP since we’re using TWEEN for smooth animations) -->
     <style>
       /* ---------- Global & Reset Styles ---------- */
       * {
@@ -285,7 +285,10 @@
       <!-- Capabilities Section -->
       <section class="capabilities">
         <h2>Our Capabilities</h2>
-        <p>We provide cutting-edge solutions for space traffic management, including:</p>
+        <p>
+          We provide cutting-edge solutions for space traffic management,
+          including:
+        </p>
         <ul>
           <li>Real-time satellite tracking</li>
           <li>Debris monitoring and collision avoidance</li>
@@ -358,11 +361,12 @@
       })();
     </script>
 
-    <!-- ---------- Interactive Globe Script using ES Modules ---------- -->
+    <!-- ---------- Interactive Globe Script using ES Modules and TWEEN ---------- -->
     <script type="module">
       import * as THREE from "https://unpkg.com/three@0.150.0/build/three.module.js";
       import { OrbitControls } from "https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js";
       import ThreeGlobe from "https://unpkg.com/three-globe?module";
+      import TWEEN from "https://unpkg.com/three@0.150.0/examples/jsm/libs/tween.module.js";
 
       // Sample satellite markers with dummy lat/lng values
       const satelliteMarkers = [
@@ -373,9 +377,7 @@
 
       // Create the globe using ThreeGlobe
       const GlobeObj = new ThreeGlobe()
-        .globeImageUrl(
-          "https://unpkg.com/three-globe/example/img/earth-dark.jpg"
-        )
+        .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-dark.jpg")
         .pointsData(satelliteMarkers)
         .pointLat("lat")
         .pointLng("lng")
@@ -415,6 +417,8 @@
 
       function animateGlobe() {
         requestAnimationFrame(animateGlobe);
+        // Update TWEEN for smooth animations (Option 3)
+        TWEEN.update();
         // Optional: slowly rotate the globe for a dynamic effect
         GlobeObj.rotation.y += 0.001;
         controls.update();
