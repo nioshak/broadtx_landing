@@ -105,7 +105,7 @@
         height: 500px;
         position: relative;
       }
-      /* Container for the dynamic satellite details */
+      /* Container for dynamic satellite details */
       #satelliteInfo {
         margin-top: 1rem;
         padding: 0.5rem;
@@ -203,9 +203,8 @@
         </div>
       </div>
       <div class="dashboard-content">
-        <!-- Globe container -->
         <div class="globe-container" id="globeContainer"></div>
-        <!-- Satellite details container (will be updated dynamically) -->
+        <!-- Container for dynamic satellite details -->
         <div id="satelliteInfo"></div>
       </div>
     </div>
@@ -289,11 +288,11 @@
 
     <!-- ---------- Globe Visualization Script using Three.js ---------- -->
     <script type="module">
-      // Import Three.js and OrbitControls from absolute URLs.
+      // Import Three.js and OrbitControls using absolute URLs.
       import * as THREE from "https://unpkg.com/three@0.150.0/build/three.module.js";
       import { OrbitControls } from "https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js";
 
-      // Get the container for the globe.
+      // Get the container element for the globe.
       const container = document.getElementById("globeContainer");
       const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
@@ -334,17 +333,42 @@
       // Create satellite markers (small red spheres) and assign orbit parameters.
       const satellites = [];
       const satelliteGeometry = new THREE.SphereGeometry(1.5, 16, 16);
+      // We'll use MeshBasicMaterial for satellites.
       const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      // Each satellite gets a unique number.
       const satelliteData = [
-        { orbitRadius: 65, speed: 0.02, angle: Math.random() * Math.PI * 2 },
-        { orbitRadius: 70, speed: 0.015, angle: Math.random() * Math.PI * 2 },
-        { orbitRadius: 75, speed: 0.01, angle: Math.random() * Math.PI * 2 }
+        { id: 1, orbitRadius: 65, speed: 0.02, angle: Math.random() * Math.PI * 2 },
+        { id: 2, orbitRadius: 70, speed: 0.015, angle: Math.random() * Math.PI * 2 },
+        { id: 3, orbitRadius: 75, speed: 0.01, angle: Math.random() * Math.PI * 2 }
       ];
       satelliteData.forEach((data) => {
-        const sat = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
-        sat.userData = data;
+        const sat = new THREE.Mesh(satelliteGeometry, satelliteMaterial.clone());
+        // Save the data for later use.
+        sat.userData = { ...data, baseOrbitRadius: data.orbitRadius };
         scene.add(sat);
         satellites.push(sat);
+      });
+
+      // For interactivity, set up raycaster and mouse vector.
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      let selectedSatellite = null;
+
+      // When the user clicks, use raycaster to select a satellite.
+      renderer.domElement.addEventListener("click", (event) => {
+        // Convert mouse position to normalized device coordinates (-1 to +1).
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(satellites);
+        if (intersects.length > 0) {
+          // Select the first satellite intersected.
+          selectedSatellite = intersects[0].object;
+        } else {
+          selectedSatellite = null;
+        }
       });
 
       // Get the container for satellite details.
@@ -358,22 +382,29 @@
         // Rotate the Earth slowly.
         earthMesh.rotation.y += 0.001;
 
-        // Update satellite positions (circular orbits with a slight tilt).
+        // Update satellite positions (simple circular orbits).
         satellites.forEach((sat) => {
           sat.userData.angle += sat.userData.speed;
           sat.position.x = sat.userData.orbitRadius * Math.cos(sat.userData.angle);
           sat.position.z = sat.userData.orbitRadius * Math.sin(sat.userData.angle);
           sat.position.y = 5 * Math.sin(sat.userData.angle * 2);
+
+          // If this satellite is selected, highlight it.
+          if (selectedSatellite === sat) {
+            sat.material.color.set(0xffff00); // Yellow for selected
+          } else {
+            sat.material.color.set(0xff0000); // Red for unselected
+          }
         });
 
         // Update the dynamic satellite details.
         let infoHTML = "";
         satellites.forEach((sat, index) => {
-          // Calculate "altitude" as (orbitRadius - Earth's radius) with a slight dynamic variation.
+          // Calculate "altitude" as (orbitRadius - Earth's radius) plus some dynamic variation.
           let altitude = (sat.userData.orbitRadius - 50) + (2 * Math.sin(Date.now() / 1000 + index));
-          // Fake collision risk based on altitude.
           let risk = altitude < 10 ? "LOW" : altitude < 20 ? "MEDIUM" : "HIGH";
-          infoHTML += `Satellite ${index + 1}:\n   Altitude: ${altitude.toFixed(2)} km\n   Collision Risk: ${risk}\n\n`;
+          let selectedMark = (selectedSatellite === sat) ? " <-- SELECTED" : "";
+          infoHTML += `Satellite ${sat.userData.id}:\n   Altitude: ${altitude.toFixed(2)} km\n   Collision Risk: ${risk}${selectedMark}\n\n`;
         });
         if (infoContainer) {
           infoContainer.innerText = infoHTML;
