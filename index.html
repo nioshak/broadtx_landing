@@ -75,52 +75,72 @@
 
       /* ---------- Dashboard Section (Globe Visualization + Satellite Data) ---------- */
       .dashboard {
-        background-color: #fff;
-        color: #333;
+        background: radial-gradient(circle, #1a1a2e, #16213e);
+        color: #c0c0c0;
         margin: 2rem auto;
-        padding: 1rem;
+        padding: 1.5rem;
         max-width: 1200px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        border: 1px solid #0f0f0f;
       }
+
       .dashboard-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid #000;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
+        border-bottom: 2px solid #0f0f0f;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
       }
+
       .dashboard-header .logo {
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: bold;
+        color: #00ffcc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
+
       .dashboard-header .nav-links a {
-        margin-left: 1rem;
+        margin-left: 1.5rem;
         font-weight: bold;
-        color: #000;
+        color: #00ffcc;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
       }
+
+      .dashboard-header .nav-links a:hover {
+        color: #ff0066;
+      }
+
       .dashboard-content {
         display: flex;
-        flex-direction: column;
-        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: center;
       }
-      /* Container for the Three.js globe */
+
       .globe-container {
-        width: 100%;
+        flex: 1;
+        min-width: 300px;
         height: 500px;
-        position: relative;
+        border: 2px solid #00ffcc;
+        border-radius: 8px;
+        overflow: hidden;
       }
-      /* Container for dynamic satellite details */
+
       #satelliteInfo {
-        margin-top: 1rem;
-        padding: 0.5rem;
-        font-family: monospace;
-        white-space: pre-wrap;
-        background: #f0f0f0;
-        width: 100%;
-        max-width: 600px;
-        border-radius: 4px;
+        flex: 1;
+        min-width: 300px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1rem;
+        border: 2px solid #00ffcc;
+        border-radius: 8px;
+        color: #00ffcc;
+        font-family: 'Courier New', Courier, monospace;
+        box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
       }
 
       /* ---------- Main Content (Capabilities & Contact Form) ---------- */
