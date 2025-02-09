@@ -5,11 +5,11 @@
     <!-- Use a viewport meta tag for responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.150.0/build/three.module.js"
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.150.0/build/three.module.js"
+        }
       }
-    }
     </script>
     <title>Space Traffic Management</title>
     <style>
@@ -29,7 +29,6 @@
         color: inherit;
         text-decoration: none;
       }
-
       /* ---------- Hero Section with Starfield ---------- */
       .hero {
         position: relative;
@@ -55,6 +54,10 @@
         text-align: center;
         padding: 0 1rem;
       }
+      .hero-content img {
+        max-width: 300px;
+        margin-bottom: 1rem;
+      }
       .hero-content h1 {
         font-size: 3rem;
         margin-bottom: 0.5rem;
@@ -72,8 +75,7 @@
         text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
         color: #ddd;
       }
-
-      /* ---------- Dashboard Section (Globe Visualization + Satellite Data) ---------- */
+      /* ---------- Dashboard Section (Globe Visualization + Satellite Data + Control Panel) ---------- */
       .dashboard {
         background: radial-gradient(circle, #1a1a2e, #16213e);
         color: #c0c0c0;
@@ -84,7 +86,6 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         border: 1px solid #0f0f0f;
       }
-
       .dashboard-header {
         display: flex;
         justify-content: space-between;
@@ -93,7 +94,6 @@
         padding-bottom: 0.75rem;
         margin-bottom: 1.5rem;
       }
-
       .dashboard-header .logo {
         font-size: 2rem;
         font-weight: bold;
@@ -101,7 +101,6 @@
         text-transform: uppercase;
         letter-spacing: 1px;
       }
-
       .dashboard-header .nav-links a {
         margin-left: 1.5rem;
         font-weight: bold;
@@ -110,18 +109,15 @@
         letter-spacing: 0.5px;
         transition: color 0.3s ease;
       }
-
       .dashboard-header .nav-links a:hover {
         color: #ff0066;
       }
-
       .dashboard-content {
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
         justify-content: center;
       }
-
       .globe-container {
         flex: 1;
         min-width: 300px;
@@ -130,9 +126,9 @@
         border-radius: 8px;
         overflow: hidden;
       }
-
       #satelliteInfo {
         flex: 1;
+        font-size: 0.9rem;
         min-width: 300px;
         background: rgba(0, 0, 0, 0.8);
         padding: 1rem;
@@ -141,6 +137,16 @@
         color: #00ffcc;
         font-family: 'Courier New', Courier, monospace;
         box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+      }
+      #satelliteInfo .satellite-detail {
+        border-bottom: 0.5px solid #00ffcc;
+        padding: 0.5rem 0;
+        margin-bottom: 0.5rem;
+      }
+      #satelliteInfo .satellite-detail h4 {
+/*        text-decoration: underline;*/
+        margin-bottom: 0.25rem;
+        color: #00ffcc;
       }
 
       /* ---------- Control Panel Styles ---------- */
@@ -200,7 +206,6 @@
       .control-panel .panel-button:hover {
         background: #ff0066;
       }
-
       /* ---------- Main Content (Capabilities & Contact Form) ---------- */
       .container {
         max-width: 800px;
@@ -223,7 +228,6 @@
         list-style-type: disc;
         margin-left: 1.5rem;
       }
-
       /* ---------- Contact Form Styles ---------- */
       .contact-form label {
         display: block;
@@ -249,7 +253,6 @@
       .contact-form button:hover {
         background-color: #333;
       }
-
       /* ---------- Footer ---------- */
       footer {
         text-align: center;
@@ -258,7 +261,6 @@
         color: #666;
         background-color: #fff;
       }
-
       /* ---------- Responsive Tweaks ---------- */
       @media (max-width: 768px) {
         .dashboard-content {
@@ -272,14 +274,13 @@
     <div class="hero">
       <canvas id="starfield"></canvas>
       <div class="hero-content">
-        <img src="broadtx_clear.png" alt="Broad Tx Logo" style="max-width: 300px;">
-        <!-- <h2>Broad Tx</h2> -->
+        <img src="broadtx_clear.png" alt="Broad Tx Logo">
         <h1>Space Traffic Management</h1>
-        <p>Ensuring safe and efficient management of space traffic.</p>
+        <p>Autonomous Collision Avoidance System.</p>
       </div>
     </div>
 
-    <!-- ---------- Dashboard Section (Globe Visualization + Satellite Data) ---------- -->
+    <!-- ---------- Dashboard Section (Globe Visualization + Satellite Data + Control Panel) ---------- -->
     <div class="dashboard">
       <div class="dashboard-header">
         <div class="logo">Broad Tx</div>
@@ -292,6 +293,7 @@
         <div class="globe-container" id="globeContainer"></div>
         <!-- Container for dynamic satellite details -->
         <div id="satelliteInfo"></div>
+        <!-- Control Panel with a toggle button for Autonomous Mode -->
         <div class="control-panel">
           <h3>Control Panel</h3>
           <div class="panel-row">
@@ -301,7 +303,7 @@
             </div>
             <div class="panel-item">
               <span class="label">Active Alerts:</span>
-              <span class="value">0</span>
+              <span class="value">3</span>
             </div>
           </div>
           <div class="panel-row">
@@ -317,6 +319,7 @@
           <div class="panel-buttons">
             <button class="panel-button">Adjust Orbit</button>
             <button class="panel-button">Initiate Scan</button>
+            <button class="panel-button" id="toggleAutonomous">Autonomous Mode</button>
           </div>
         </div>
       </div>
@@ -452,13 +455,11 @@
       // Create satellite markers (small red spheres) and assign orbit parameters.
       const satellites = [];
       const satelliteGeometry = new THREE.SphereGeometry(1.5, 16, 16);
-      // We'll use MeshBasicMaterial for satellites.
       const satelliteMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-      // Each satellite gets a unique number.
       const satelliteData = [
-        { id: 1, orbitRadius: 65, speed: 0.02, angle: Math.random() * Math.PI * 2 },
-        { id: 2, orbitRadius: 70, speed: 0.015, angle: Math.random() * Math.PI * 2 },
-        { id: 3, orbitRadius: 75, speed: 0.01, angle: Math.random() * Math.PI * 2 }
+        { id: 1, orbitRadius: 65, speed: 0.02, angle: Math.random() * Math.PI * 2, autonomous: true },
+        { id: 2, orbitRadius: 70, speed: 0.015, angle: Math.random() * Math.PI * 2, autonomous: false },
+        { id: 3, orbitRadius: 75, speed: 0.01, angle: Math.random() * Math.PI * 2, autonomous: true }
       ];
       satelliteData.forEach((data) => {
         const sat = new THREE.Mesh(satelliteGeometry, satelliteMaterial.clone());
@@ -473,17 +474,14 @@
       const mouse = new THREE.Vector2();
       let selectedSatellite = null;
 
-      // When the user clicks, use raycaster to select a satellite.
       renderer.domElement.addEventListener("click", (event) => {
         // Convert mouse position to normalized device coordinates (-1 to +1).
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(satellites);
         if (intersects.length > 0) {
-          // Select the first satellite intersected.
           selectedSatellite = intersects[0].object;
         } else {
           selectedSatellite = null;
@@ -501,33 +499,55 @@
         // Rotate the Earth slowly.
         earthMesh.rotation.y += 0.001;
 
-        // Update satellite positions (simple circular orbits).
+        // Update satellite positions (circular orbits).
         satellites.forEach((sat) => {
           sat.userData.angle += sat.userData.speed;
           sat.position.x = sat.userData.orbitRadius * Math.cos(sat.userData.angle);
           sat.position.z = sat.userData.orbitRadius * Math.sin(sat.userData.angle);
           sat.position.y = 5 * Math.sin(sat.userData.angle * 2);
-
-          // If this satellite is selected, highlight it.
+          // Highlight selected satellite.
           if (selectedSatellite === sat) {
-            sat.material.color.set(0xffff00); // Yellow for selected
+            sat.material.color.set(0xffff00);
           } else {
-            sat.material.color.set(0xff0000); // Red for unselected
+            sat.material.color.set(0xff0000);
           }
         });
 
         // Update the dynamic satellite details.
         let infoHTML = "";
         satellites.forEach((sat, index) => {
-          // Calculate "altitude" as (orbitRadius - Earth's radius) plus some dynamic variation.
+          // Calculate dynamic altitude.
           let altitude = (sat.userData.orbitRadius - 50) + (2 * Math.sin(Date.now() / 1000 + index));
           let risk = altitude < 10 ? "LOW" : altitude < 20 ? "MEDIUM" : "HIGH";
+          
+          // Determine a fake maneuver recommendation based on risk.
+          let maneuver;
+          if (risk === "HIGH") {
+            maneuver = "Immediate Correction";
+          } else if (risk === "MEDIUM") {
+            maneuver = "Monitor & Prepare Correction";
+          } else {
+            maneuver = "Maintain Course";
+          }
+          
+          // Use the stored autonomous value.
+          let autonomous = sat.userData.autonomous ? "Yes" : "No";
+          
+          // Mark if the satellite is selected.
           let selectedMark = (selectedSatellite === sat) ? " <-- SELECTED" : "";
-          infoHTML += `Satellite ${sat.userData.id}:\n   Altitude: ${altitude.toFixed(2)} km\n   Collision Risk: ${risk}${selectedMark}\n\n`;
+          
+          infoHTML += `<div class="satellite-detail">`;
+          infoHTML += `<h4>Satellite ${sat.userData.id}</h4>`;
+          infoHTML += `<p>Altitude: ${altitude.toFixed(2)} km</p>`;
+          infoHTML += `<p>Collision Risk: ${risk}</p>`;
+          infoHTML += `<p>Maneuver Recommendation: ${maneuver}</p>`;
+          infoHTML += `<p>Autonomous Mode: ${autonomous}${selectedMark}</p>`;
+          infoHTML += `</div>`;
         });
         if (infoContainer) {
-          infoContainer.innerText = infoHTML;
+          infoContainer.innerHTML = infoHTML;
         }
+
 
         renderer.render(scene, camera);
       }
@@ -540,6 +560,13 @@
         renderer.setSize(width, height);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
+      });
+
+      // Add event listener for the "Toggle Autonomous" button.
+      document.getElementById("toggleAutonomous").addEventListener("click", () => {
+        if (selectedSatellite) {
+          selectedSatellite.userData.autonomous = !selectedSatellite.userData.autonomous;
+        }
       });
     </script>
   </body>
